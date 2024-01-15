@@ -57,6 +57,16 @@ void property_override(char const prop[], char const value[], bool add = true)
         __system_property_add(prop, strlen(prop), value, strlen(value));
 }
 
+void set_ro_build_prop(const std::string &prop, const std::string &value) {
+    for (const auto &source : ro_props_default_source_order) {
+        auto prop_name = "ro." + source + "build." + prop;
+        if (source == "")
+            property_override(prop_name.c_str(), value.c_str());
+        else
+            property_override(prop_name.c_str(), value.c_str(), false);
+    }
+};
+
 void set_ro_product_prop(const std::string &prop, const std::string &value) {
     for (const auto &source : ro_props_default_source_order) {
         auto prop_name = "ro.product." + source + prop;
@@ -65,7 +75,25 @@ void set_ro_product_prop(const std::string &prop, const std::string &value) {
 };
 
 void vendor_load_properties() {
-    set_ro_product_prop("device", "cepheus");
-    set_ro_product_prop("model", "MI 9");
-    set_ro_product_prop("name", "cepheus");
+    std::string hardware_revision;
+    hardware_revision = GetProperty("ro.boot.hwversion", "UNKNOWN");
+
+    std::string model;
+    std::string device;
+    std::string fingerprint;
+    std::string description;
+
+        model = "MI 9";
+        device = "cepheus";
+        fingerprint = "google/redfin/redfin:13/TQ3A.230901.001/10750268:user/release-keys";
+        description = "redfin-user 13 TQ3A.230901.001 10750268 release-keys";
+
+    set_ro_build_prop("fingerprint", fingerprint);
+    set_ro_product_prop("device", device);
+    set_ro_product_prop("model", model);
+    property_override("ro.build.description", description.c_str());
+    property_override("ro.boot.hardware.revision", hardware_revision.c_str());
+
+    // SafetyNet workaround
+    property_override("ro.boot.verifiedbootstate", "green");
 }
