@@ -108,6 +108,7 @@ BOARD_RAMDISK_OFFSET := 0x01000000
 
 TARGET_KERNEL_CONFIG := cepheus_defconfig
 TARGET_KERNEL_SOURCE := kernel/xiaomi/cepheus
+KERNEL_LLVM_SUPPORT := true
 
 BOARD_KERNEL_CMDLINE := console=ttyMSM0,115200n8 earlycon=msm_geni_serial,0xa90000
 BOARD_KERNEL_CMDLINE += androidboot.hardware=qcom androidboot.console=ttyMSM0
